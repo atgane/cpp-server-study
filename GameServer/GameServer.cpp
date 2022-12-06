@@ -11,6 +11,7 @@
 
 #include "ThreadManager.h"
 #include "RefCounting.h"
+#include "memory.h"
 
 using KnightRef = TSharedPtr<class Knight>;
 using InventoryRef = TSharedPtr<class Inventory>;
@@ -25,18 +26,6 @@ public:
 	~Knight()
 	{
 		cout << "~K" << endl;
-	}
-	static void* operator new(size_t size)
-	{
-		cout << "new" << size << endl;
-		void* ptr = ::malloc(size);
-		return ptr;
-	}
-
-	static void operator delete(void* ptr)
-	{
-		cout << "delete" << endl;
-		::free(ptr);
 	}
 
 public:
@@ -56,11 +45,8 @@ public:
 	Knight& _knight;
 };
 
-
-
-
-
 int main() {
-	Knight* knight = new Knight();
-	delete knight;
+	// 이렇게 main에서 xnew, xdelete를 호출한다. 
+	Knight* knight = xnew<Knight>();
+	xdelete(knight);
 }

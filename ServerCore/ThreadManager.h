@@ -13,7 +13,6 @@ public:
 	ThreadManager();
 	~ThreadManager();
 
-	// 4. 함수를 컬백을 하여 쓰레드를 실행
 	void Launch(function<void(void)> callback);
 	void Join();
 
