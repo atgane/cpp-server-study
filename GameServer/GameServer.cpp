@@ -13,10 +13,14 @@
 #include "RefCounting.h"
 #include "memory.h"
 
-using KnightRef = TSharedPtr<class Knight>;
-using InventoryRef = TSharedPtr<class Inventory>;
+class Player
+{
+public:
+	Player() {}
+	virtual ~Player() {}
+};
 
-class Knight : public RefCountable
+class Knight : public Player
 {
 public:
 	Knight()
@@ -28,25 +32,13 @@ public:
 		cout << "~K" << endl;
 	}
 
-public:
-
-	KnightRef _target = nullptr;
-	InventoryRef _inventory = nullptr;
-};
-
-class Inventory : public RefCountable
-{
-public:
-	Inventory(KnightRef knight) : _knight(**knight)
-	{
-
-	}
-
-	Knight& _knight;
+	int32 _hp = 100;
+	int32 _mp = 10;
 };
 
 int main() {
-	// 이렇게 main에서 xnew, xdelete를 호출한다. 
-	Knight* knight = xnew<Knight>();
+	Knight* knight = (Knight*)xnew<Player>();
+
+	knight->_hp = 100;
 	xdelete(knight);
 }

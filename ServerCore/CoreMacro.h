@@ -16,8 +16,8 @@
 		MEMORY
 ----------------------*/
 #ifdef _DEBUG
-#define _xalloc(size) BaseAllocator::Alloc(size)
-#define _xrelease(ptr) BaseAllocator::Release(ptr)
+#define _xalloc(size) StompAllocator::Alloc(size)
+#define _xrelease(ptr) StompAllocator::Release(ptr)
 #else
 #define _xalloc(size) BaseAllocator::Alloc(size)
 #define _xrelease(ptr) BaseAllocator::Release(ptr)
