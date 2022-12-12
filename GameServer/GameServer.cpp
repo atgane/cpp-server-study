@@ -37,8 +37,7 @@ public:
 };
 
 int main() {
-	Knight* knight = (Knight*)xnew<Player>();
-
-	knight->_hp = 100;
-	xdelete(knight);
+	vector<int32, StlAllocator<int32>> v;
+	
+	map<int32, int32> m;
 }

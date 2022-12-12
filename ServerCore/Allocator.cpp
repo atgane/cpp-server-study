@@ -47,11 +47,5 @@ void StompAllocator::Release(void* ptr)
 	const int64 address = reinterpret_cast<int64>(ptr);
 	const int64 baseAddress = address - (address % PAGE_SIZE);
 	
-	// 4. release가 호출되면 MEM_RELEASE를 호출한다. 
 	::VirtualFree(reinterpret_cast<void*>(baseAddress), 0, MEM_RELEASE);
 }
-
-// 장점. 메모리 할당 해제 후 접근 오류를 잡을 수 있다. 
-// 단점. 1바이트만 할당해도 4096만큼의 메모리를 쳐먹는다. 그래서 메모리 낭비가 심한 단점이 있다.
-// 한계. 메모리 오버플로우 문제를 잡지 못한다. (그런데? 언더플로우는 잡는다!)
-// 한계 극복 방법. 메모리를 처음위치에서 쓰는게 아니라 마지막 위치부터 쓴다!
