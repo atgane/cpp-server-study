@@ -2,8 +2,10 @@
 #include "CoreGlobal.h"
 #include "ThreadManager.h"
 #include "DeadLockProfiler.h"
+#include "Memory.h"
 
 ThreadManager* GThreadManager = nullptr;
+Memory* GMemory = nullptr;
 DeadLockProfiler* GDeadLockProfiler = nullptr;
 
 // 8. 나중에 여러 메니저끼리 순서를 지정하는 경우 CoreGlobal에서
@@ -15,10 +17,12 @@ class CoreGlobal
 public:
 	CoreGlobal() {
 		GThreadManager = new ThreadManager();
+		GMemory = new Memory();
 		GDeadLockProfiler = new DeadLockProfiler();
 	}
 	~CoreGlobal() {
 		delete GThreadManager;
+		delete GMemory;
 		delete GDeadLockProfiler;
 	}
 } GCoreGlobal;

@@ -12,6 +12,7 @@
 #include "ThreadManager.h"
 #include "RefCounting.h"
 #include "memory.h"
+#include "Allocator.h"
 
 class Player
 {
@@ -37,7 +38,22 @@ public:
 };
 
 int main() {
-	vector<int32, StlAllocator<int32>> v;
-	
-	map<int32, int32> m;
+	for (int32 i = 0; i < 5; i++)
+	{
+		GThreadManager->Launch([]()
+			{
+				while (true)
+				{
+					Vector<Knight> v(10);
+					
+					Map<int32, Knight> a;
+					
+					a[100] = Knight();
+					
+					this_thread::sleep_for(10ms);
+				}
+			});
+	}
+
+	GThreadManager->Join();
 }
