@@ -20,7 +20,18 @@ public:
 	int32 _hp = rand() % 1000;
 };
 
+class Monster
+{
+public:
+	int64 _id = 0;
+};
+
 int main() {
+	Knight* k = ObjectPool<Knight>::Pop();
+	ObjectPool<Knight>::Push(k);
+
+	shared_ptr<Knight> sptr = { ObjectPool<Knight>::Pop(), ObjectPool<Knight>::Push };
+
 	
 	for (int32 i = 0; i < 5; i++)
 	{
