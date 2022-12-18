@@ -45,7 +45,8 @@ public:
 
 private:
 	int32 _allocSize = 0;
-	atomic<int32> _allocCount = 0;
+	atomic<int32> _useCount = 0;
+	atomic<int32> _reserveCount = 0; // 메모리 풀에 저장이 된 것
 
 	SLIST_HEADER _header; // lock-free stack을 관리하는 헤더
 };

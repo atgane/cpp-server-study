@@ -27,10 +27,22 @@ public:
 };
 
 int main() {
+	Knight* knights[100];
+	
+	for (int32 i = 0; i < 100; i++)
+		knights[i] = ObjectPool<Knight>::Pop();
+
+	for (int32 i = 0; i < 100; i++)
+	{
+		ObjectPool<Knight>::Push(knights[i]);
+		knights[i] = nullptr;
+	}
+
 	Knight* k = ObjectPool<Knight>::Pop();
 	ObjectPool<Knight>::Push(k);
 
-	shared_ptr<Knight> sptr = { ObjectPool<Knight>::Pop(), ObjectPool<Knight>::Push };
+	shared_ptr<Knight> sptr = ObjectPool<Knight>::MakeShared();
+	shared_ptr<Knight> sptr2 = MakeShared<Knight>();
 
 	
 	for (int32 i = 0; i < 5; i++)
