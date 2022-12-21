@@ -13,50 +13,54 @@
 #include "RefCounting.h"
 #include "memory.h"
 #include "Allocator.h"
+#include "TypeCast.h"
 
-class Knight
+class Class
 {
 public:
-	int32 _hp = rand() % 1000;
+	virtual void Print() {
+
+	}
+
+private:
+	int _hp = 0;
+	int _mp = 0;
 };
 
-class Monster
+class Knight : public Class
 {
-public:
-	int64 _id = 0;
+private:
+	int _hp = 0;
+	int _mp = 0;
+};
+
+class Archer : public Class
+{
+private:
+	int _hp = 0;
+	int _mp = 0;
+};
+
+class Gunner : public Class
+{
+private:
+	int _hp = 0;
+	int _mp = 0;
+};
+
+class Mage : public Class
+{
+private:
+	int _hp = 0;
+	int _mp = 0;
 };
 
 int main() {
-	Knight* knights[100];
+	using TL = TypeList<Class, Knight, Archer, Gunner, Mage>;
 	
-	for (int32 i = 0; i < 100; i++)
-		knights[i] = ObjectPool<Knight>::Pop();
+	TypeConversion<TL> test;
 
-	for (int32 i = 0; i < 100; i++)
-	{
-		ObjectPool<Knight>::Push(knights[i]);
-		knights[i] = nullptr;
-	}
+	test.s_convert[0][0];
 
-	Knight* k = ObjectPool<Knight>::Pop();
-	ObjectPool<Knight>::Push(k);
-
-	shared_ptr<Knight> sptr = ObjectPool<Knight>::MakeShared();
-	shared_ptr<Knight> sptr2 = MakeShared<Knight>();
-
-	
-	for (int32 i = 0; i < 5; i++)
-	{
-		GThreadManager->Launch([]() {
-			while (true)
-			{
-				Knight* knight = xnew<Knight>();
-				cout << knight->_hp << endl;
-				this_thread::sleep_for(10ms);
-				xdelete(knight);
-			}
-		});
-	}
-
-	GThreadManager->Join();
+	cout << endl;
 }

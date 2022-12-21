@@ -166,6 +166,7 @@
     <ClInclude Include="RefCounting.h" />
     <ClInclude Include="ThreadManager.h" />
     <ClInclude Include="Types.h" />
+    <ClInclude Include="TypeCast.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Allocator.cpp" />
