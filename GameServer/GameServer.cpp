@@ -16,17 +16,12 @@
 
 int main()
 {
-	// 1. 소켓 라이브러리 초기화
-// 관련 정보가 wsaData에 채워진다. 
 	WSAData wsaData;
 	if (::WSAStartup(MAKEWORD(2, 2), &wsaData) != 0)
 	{
 		return 0;
 	}
 
-	// 2. 소켓 열기
-	// AF_INET: IPv4, AF_INET6: IPv6
-	// SOCK_STREAM: tcp, SOCK_DGRAM: udp
 	SOCKET listenSocket = ::socket(AF_INET, SOCK_STREAM, 0);
 	if (listenSocket == INVALID_SOCKET)
 	{
@@ -35,7 +30,6 @@ int main()
 		return 0;
 	}
 
-	// 3. 주소만들기
 	SOCKADDR_IN serverAddr;
 	::memset(&serverAddr, 0, sizeof(serverAddr));
 	serverAddr.sin_family = AF_INET;
@@ -49,7 +43,6 @@ int main()
 		return 0;
 	}
 
-	// 4. 영업 시작
 	if (::listen(listenSocket, 10) == SOCKET_ERROR)
 	{
 		int32 errCode = ::WSAGetLastError();
@@ -74,8 +67,31 @@ int main()
 		char ipAddress[16];
 		::inet_ntop(AF_INET, &clientAddr.sin_addr, ipAddress, sizeof(ipAddress));
 		cout << "Client IP = " << ipAddress << endl;
+
+		while (true)
+		{
+			char recvBuffer[1000];
+			int recvLen = ::recv(clientSocket, recvBuffer, sizeof(recvBuffer), 0);
+
+			if (recvLen <= 0)
+			{
+				int32 errCode = ::WSAGetLastError();
+				cout << "Recv ErrorCode : " << errCode << endl;
+				return 0;
+			}
+
+			cout << "Recv Data! Data = " << recvBuffer << endl;
+			cout << "Recv Data! Len = " << recvLen << endl;
+
+			int32 resultCode = ::send(clientSocket, recvBuffer, recvLen, 0);
+			if (resultCode == SOCKET_ERROR)
+			{
+				int32 errCode = ::WSAGetLastError();
+				cout << "Send ErrorCode : " << errCode << endl;
+				return 0;
+			}
+		}
 	}
 
-	// 7. 접속 종료
 	::WSACleanup();
 }
