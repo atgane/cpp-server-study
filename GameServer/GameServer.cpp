@@ -14,6 +14,12 @@
 #include <WS2tcpip.h>
 #pragma comment(lib, "ws2_32.lib")
 
+void HandleError(const char* cause)
+{
+	int32 errCode = ::WSAGetLastError();
+	cout << cause << "ErrorCode : " << errCode << endl;
+}
+
 int main()
 {
 	WSAData wsaData;
@@ -22,31 +28,25 @@ int main()
 		return 0;
 	}
 
-	SOCKET listenSocket = ::socket(AF_INET, SOCK_STREAM, 0);
-	if (listenSocket == INVALID_SOCKET)
+	// 1. UDP 서버의 경우, listenSocket과 clientSocket을 나누지 않는다.
+	// UDP의 경우 SOCK_DGRAM으로 해준다. 
+	SOCKET serverSocket = socket(AF_INET, SOCK_DGRAM, 0);
+	if (serverSocket == INVALID_SOCKET)
 	{
-		int32 errCode = ::WSAGetLastError();
-		cout << "Socket Error code: " << errCode << endl;
+		HandleError("Socket");
 		return 0;
 	}
 
 	SOCKADDR_IN serverAddr;
 	::memset(&serverAddr, 0, sizeof(serverAddr));
 	serverAddr.sin_family = AF_INET;
+
 	serverAddr.sin_addr.s_addr = ::htonl(INADDR_ANY);
 	serverAddr.sin_port = ::htons(7777);
 
-	if (::bind(listenSocket, (SOCKADDR*)&serverAddr, sizeof(serverAddr)) == SOCKET_ERROR)
+	if (::bind(serverSocket, (SOCKADDR*)&serverAddr, sizeof(serverAddr)) == SOCKET_ERROR)
 	{
-		int32 errCode = ::WSAGetLastError();
-		cout << "Bind Error code: " << errCode << endl;
-		return 0;
-	}
-
-	if (::listen(listenSocket, 10) == SOCKET_ERROR)
-	{
-		int32 errCode = ::WSAGetLastError();
-		cout << "Listen Error code: " << errCode << endl;
+		HandleError("bind");
 		return 0;
 	}
 
@@ -54,44 +54,37 @@ int main()
 	{
 		SOCKADDR_IN clientAddr;
 		::memset(&clientAddr, 0, sizeof(clientAddr));
-
 		int32 addrLen = sizeof(clientAddr);
-		SOCKET clientSocket = ::accept(listenSocket, (SOCKADDR*)&clientAddr, &addrLen);
-		if (clientSocket == INVALID_SOCKET)
+
+		char recvBuffer[1000];
+
+		// 2. UDP에서 수신하는 방법
+		int32 recvLen = ::recvfrom(serverSocket, recvBuffer, sizeof(recvBuffer), 0, 
+			(SOCKADDR*)&clientAddr, &addrLen);
+
+		if (recvLen <= 0)
 		{
-			int32 errCode = ::WSAGetLastError();
-			cout << "Accept Error code: " << errCode << endl;
+			HandleError("RecvFrom");
+			return 0; 
+		}
+
+		cout << "Recv Data! Data = " << recvBuffer << endl;
+		cout << "Recv Data! Len = " << recvLen << endl;
+
+		// 3. UDP에서 송신하는 방법
+		int32 errorCode = ::sendto(serverSocket, recvBuffer, recvLen, 0,
+			(SOCKADDR*)&clientAddr, sizeof(clientAddr));
+
+		if (errorCode == SOCKET_ERROR)
+		{
+			HandleError("SendTo");
 			return 0;
 		}
 
-		char ipAddress[16];
-		::inet_ntop(AF_INET, &clientAddr.sin_addr, ipAddress, sizeof(ipAddress));
-		cout << "Client IP = " << ipAddress << endl;
-
-		while (true)
-		{
-			char recvBuffer[1000];
-			int recvLen = ::recv(clientSocket, recvBuffer, sizeof(recvBuffer), 0);
-
-			if (recvLen <= 0)
-			{
-				int32 errCode = ::WSAGetLastError();
-				cout << "Recv ErrorCode : " << errCode << endl;
-				return 0;
-			}
-
-			cout << "Recv Data! Data = " << recvBuffer << endl;
-			cout << "Recv Data! Len = " << recvLen << endl;
-
-			int32 resultCode = ::send(clientSocket, recvBuffer, recvLen, 0);
-			if (resultCode == SOCKET_ERROR)
-			{
-				int32 errCode = ::WSAGetLastError();
-				cout << "Send ErrorCode : " << errCode << endl;
-				return 0;
-			}
-		}
+		cout << "Send Data! Len = " << recvLen << endl;
 	}
+
+
 
 	::WSACleanup();
 }
